@@ -1,0 +1,38 @@
+{
+	"Settings":{
+		"VehiclesCountEst":		100,
+		"twowaydisplacement":	0.005,
+		"TurnProbability":{
+			"right":			0.30,
+			"forward":			0.60,
+			"left":				0.30,
+			"u-turn":			0.10
+		},
+		"TurnAssignment":{
+			"right": 			[1,135],
+			"forward":			[135,225],
+			"left":				[225,350],
+			"u-turn":			[350,361]
+		},
+		"Defaults":{
+			"RoadSpeed":		60,
+			"RoadLanes":		2
+		}
+	},
+	"Edits":{
+		"no_right_junc":	[],
+		"no_left_junc":		[],
+		"no_left_T_junc":	[],
+		"no_forward_junc":	[],
+		"no_u-turn_junc":	[],
+
+		"remove":			[],
+		"add":				[],
+
+		"maxspeed080":		[],
+							  
+		"maxspeed100":		[],
+							  
+		"1lanes":			[]
+	}
+}

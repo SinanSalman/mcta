@@ -1,0 +1,191 @@
+{
+    "VehiclesCountEst": 100,
+    "bbox_map": {
+        "maxlat": 0,
+        "maxlon": 0,
+        "minlat": 0,
+        "minlon": 0
+    },
+    "bbox_roads": {
+        "maxlat": 2,
+        "maxlon": 9,
+        "minlat": 1,
+        "minlon": 1
+    },
+    "links": {
+        "0": {
+            "dst": 1,
+            "edits": "",
+            "lanes": 1,
+            "length": 157.22543203804852,
+            "org": 0,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "1": {
+            "dst": 0,
+            "edits": "",
+            "lanes": 1,
+            "length": 157.22543203804852,
+            "org": 1,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "2": {
+            "dst": 1,
+            "edits": "",
+            "lanes": 1,
+            "length": 222.2543656542266,
+            "org": 2,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "3": {
+            "dst": 2,
+            "edits": "",
+            "lanes": 1,
+            "length": 222.2543656542266,
+            "org": 1,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "4": {
+            "dst": 0,
+            "edits": "",
+            "lanes": 1,
+            "length": 157.22543203804852,
+            "org": 2,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "5": {
+            "dst": 2,
+            "edits": "",
+            "lanes": 1,
+            "length": 157.22543203804852,
+            "org": 0,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "6": {
+            "dst": 2,
+            "edits": "",
+            "lanes": 1,
+            "length": 222.2543656542266,
+            "org": 3,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "7": {
+            "dst": 3,
+            "edits": "",
+            "lanes": 1,
+            "length": 222.2543656542266,
+            "org": 2,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "8": {
+            "dst": 3,
+            "edits": "",
+            "lanes": 1,
+            "length": 222.2543656542266,
+            "org": 4,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "9": {
+            "dst": 4,
+            "edits": "",
+            "lanes": 1,
+            "length": 222.2543656542266,
+            "org": 3,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "10": {
+            "dst": 4,
+            "edits": "",
+            "lanes": 1,
+            "length": 157.22543203804852,
+            "org": 5,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "11": {
+            "dst": 5,
+            "edits": "",
+            "lanes": 1,
+            "length": 157.22543203804852,
+            "org": 4,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "12": {
+            "dst": 4,
+            "edits": "",
+            "lanes": 1,
+            "length": 222.2543656542266,
+            "org": 6,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "13": {
+            "dst": 6,
+            "edits": "",
+            "lanes": 1,
+            "length": 222.2543656542266,
+            "org": 4,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "14": {
+            "dst": 5,
+            "edits": "",
+            "lanes": 1,
+            "length": 157.22543203804852,
+            "org": 6,
+            "speed": 60,
+            "type": "LineString"
+        },
+        "15": {
+            "dst": 6,
+            "edits": "",
+            "lanes": 1,
+            "length": 157.22543203804852,
+            "org": 5,
+            "speed": 60,
+            "type": "LineString"
+        }
+    },
+    "nodes": {
+        "0": {
+            "lat": 1,
+            "lon": 8
+        },
+        "1": {
+            "lat": 2,
+            "lon": 9
+        },
+        "2": {
+            "lat": 2,
+            "lon": 7
+        },
+        "3": {
+            "lat": 2,
+            "lon": 5
+        },
+        "4": {
+            "lat": 2,
+            "lon": 3
+        },
+        "5": {
+            "lat": 1,
+            "lon": 2
+        },
+        "6": {
+            "lat": 2,
+            "lon": 1
+        }
+    }
+}
