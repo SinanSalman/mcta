@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Create map PNG, JSON and GeoJSON files from line network representation GeoGJSON file. The 
 model processes a simple one-way line network geoJSON export from qGIS. The output GeoJSON
@@ -9,11 +11,11 @@ can be further fine-tuned in qGIS, and ultimately use in MCTA. The model will:
 	- apply edits from the configuration file
 
 Syntax:
-	ipython prep_geojson.py -- [options] {BaseName}
+	python prep_geojson.py [options] {BaseName}
 
 options:
 	--verbose	|	-v				display verbose messages and detailed results
-	--basemap	|	-b				create basemap
+	--nobasemap	|	-n				don't create basemap
 
 Input data files to load (must be in the script folder): 
 	{BaseName}-config.json			configuration (settings and rules) JSON file
@@ -21,16 +23,16 @@ Input data files to load (must be in the script folder):
 									 (single link features)
 Output file:
 	{BaseName}-Map.geojson			GeoSJSON file with added link attributes and two-way
-									 roads for analysis in qGIS and input into mcta.py
-	{BaseName}-Map.json				Road network data in JSON format
-	{BaseName}-Map.png				Basemap for the road network
-	{BaseName}-Map.points.geojson	Basemap for the road network
+									 roads for analysis in qGIS and use in mcta.py
+	{BaseName}-Map.json				Road network data in JSON format for use in mcta.py
+	{BaseName}-Map.png				Basemap for the road network for use in mcta_vis.py
+	{BaseName}-Map.points.geojson	Road network points for display in qGIS
 
 Complete Code run-through test:
-	ipython ./prep_geojson.py --  --verbose --basemap {BaseName}
-	ipython ./prep_geojson.py --  -v -b {BaseName}	
+	python ./prep_geojson.py --verbose {BaseName}
+	python ./prep_geojson.py -v {BaseName}	
 	
-Code by Sinan Salman, 2016
+Code by Sinan Salman, 2016-2019
 """
 
 HELP_MSG = "Options:\n\
@@ -38,10 +40,11 @@ HELP_MSG = "Options:\n\
 \t--basemap  | -b  create basemap\n"
 
 __author__ = 	"Sinan Salman (sinan.salman@zu.ac.ae)"
-__version__ = 	"Revision: 0.1"
-__date__ = 		"Date: 2016/08/29"
-__copyright__ = "Copyright (c)2016 Sinan Salman"
+__version__ = 	"Revision: 0.11"
+__date__ = 		"Date: 2019/06/10"
+__copyright__ = "Copyright (c)2019 Sinan Salman"
 __license__ = 	"GPLv3"
+
 
 ### Initialization #######################################################################
 
@@ -52,7 +55,7 @@ import math
 
 # options
 verbose = False
-basemap = False
+basemap = True
 
 # global variables
 path = ""
@@ -67,6 +70,8 @@ Settings = {}
 Edits = {}
 connectedlinks = {}
 connectedlinksProb = {}
+LinkReverseDirection = []
+
 
 ### Data processing ######################################################################
 
@@ -77,18 +82,19 @@ def ProcessCLI():
 	global basemap
 
 	if len(sys.argv) == 1:
-		print("Missing argument\n\nSyntax:\n\tipython prep_geojson.py -- [options] {BaseName}")
+		print("Missing argument\n\nSyntax:\n\tpython prep_geojson.py [options] {BaseName}")
 		print(HELP_MSG)
 		sys.exit(0)
 
 	if '--verbose' in sys.argv or '-v' in sys.argv:
 		print ("*** option: verbose mode")
 		verbose = True
-	if '--basemap' in sys.argv or '-b' in sys.argv:
-		print ("*** option: create basemap")
-		basemap = True
+	if '--nobasemap' in sys.argv or '-n' in sys.argv:
+		print ("*** option: skipping creation of basemap")
+		basemap = False
 	base = sys.argv[len(sys.argv)-1]
  
+
 def LoadDataFiles():
 	"""load data and configuration files"""
 	global path
@@ -121,10 +127,12 @@ def LoadDataFiles():
 		print ("\nerror - can't find JSON file for the specified BaseName: " + base)
 		sys.exit(0)	
 
+
 def process_GeoJSON(geojson):
 	"""convert geojson file to json, assuming all lines are made of exactly two points (no multi-segment lines)"""
 	maxlon = -1000 # large numbers to initialize
 	maxlat = -1000
+	lcounter = 0
 	for line in geojson['features']:
 		assert len(line['geometry']['coordinates'])==2, 'multi-segment lines are not implemented. feature#' + str(int(lcounter/2))
 		mid_lon = (line['geometry']['coordinates'][0][0]+line['geometry']['coordinates'][1][0])/2
@@ -133,6 +141,7 @@ def process_GeoJSON(geojson):
 		if mid_lon > maxlon:# and mid_lat > maxlat: 
 			maxlon = mid_lon
 			maxlat = mid_lat
+		lcounter += 2 
 	for line in geojson['features']:
 		line['geometry']['SortVal'] = distance_on_earth_est1(maxlat, maxlon, line['geometry']['midpoint'][1], line['geometry']['midpoint'][0])
 	global links
@@ -149,6 +158,7 @@ def process_GeoJSON(geojson):
 		links[lcounter] = {'type':RoadType, 'org':ptA, 'dst':ptB, 'length':length, 'speed': speed, 'lanes': lanes, 'edits': ""}
 		links[lcounter+1] = {'type':RoadType, 'org':ptB, 'dst':ptA, 'length':length, 'speed': speed, 'lanes': lanes, 'edits': ""}
 		lcounter += 2 
+
 
 def addnode(pt):
 	"""find existing node from coordinates or create a new one and return its referance"""
@@ -171,6 +181,7 @@ def addnode(pt):
 	addnode.ncounter += 1
 	return addnode.ncounter - 1
 addnode.ncounter = 0
+
 
 def distance_on_earth_est1(lat1, long1, lat2, long2):
 	"""Convert latitude and longitude to km using the great circule equation
@@ -200,6 +211,7 @@ def distance_on_earth_est1(lat1, long1, lat2, long2):
 	# To get the distance in kilometers, multiply by 6371.
 	return arc * 6371
 
+
 def distance_on_earth_est2(lat1, lon1, lat2, lon2):
 	"""Convert latitude and longitude to km using rough estimates
 	based on: http://gis.stackexchange.com/questions/5821/calculating-latitude-longitude-x-miles-from-point"""
@@ -208,12 +220,14 @@ def distance_on_earth_est2(lat1, lon1, lat2, lon2):
 	dx = (lon2-lon1) * math.cos(lat1) * lat2km 
 	return math.sqrt(dx**2 + dy**2)
 
+
 def test_distance_on_earth(): # for comparison and testing purposes only
 	"""Test and compare the two estimation methods for earth distance using a ~20KM range"""
 	est1 = distance_on_earth_est1(54.3181,24.3956,54.4888,24.5193)
 	est2 = distance_on_earth_est2(54.3181,24.3956,54.4888,24.5193)
 	print ('est1=',est1,'\nest2=',est2,'\ndiff=',(est1-est2)/est1*100,'%')
-			
+
+		
 ### Generate turning probabilities #######################################################
 
 def BuildNetwork():
@@ -240,9 +254,10 @@ def BuildNetwork():
 			turnlinks = connectedlinks[l1][t]
 			num = len(turnlinks)
 			if verbose and num>0: print ('\t\t\t{:>8}:{:10}\t(Tot.prob:{:.5f})'.format(t,str(turnlinks),turnProb[t]/totalprob))
-			for tl in turnlinks:
+			for _ in turnlinks:
 				connectedlinksProb[l1][t].extend([turnProb[t]/num/totalprob])
 		assert round(sum([Pr for (k,v) in connectedlinksProb[l1].items() for Pr in v] ), 8) == 1, 'error - total probability sum not equal to 1 (link:{:})'.format(l1) 
+
 
 def assignTurnType(l1,l2):
 	"""calculate the angle between two lines and assign a turn type accordingly"""
@@ -267,6 +282,7 @@ def assignTurnType(l1,l2):
 		alpha <= Settings['TurnAssignment']['u-turn'][1]:
 		return 'u-turn'
 	assert False,"error - could not determin turnType for links: " + l1 + " and " + l2 #if execution gets here there is a problem
+
 
 def ApplyEdits():
 	"""Apply edits into road network."""
@@ -367,7 +383,8 @@ def ApplyEdits():
 	for id in links.keys():
 		links[id]['edits'] = EditsDone[id].strip(", ")
 	if verbose: print ('\n\tedits summary:\n\t\t{:}'.format(str(EditsDone).replace("', ","\n\t\t ").replace("'","")))
-	
+
+
 def CheckNetworkReducability(link=None, network=None):
 	"""check network reducability; will error if reducable, and stay silent if not reducable"""
 	if link != None and network == None:
@@ -396,10 +413,16 @@ CheckNetworkReducability.Network = {}
 CheckNetworkReducability.RemNodes = []
 CheckNetworkReducability.log = ""
 	 
+
 ### Get basemap for the resulting bounding box ###########################################
 
 def GetBaseMap():
 	import smopy
+	# https://github.com/CartoDB/basemap-styles
+	# https://github.com/CartoDB/cartodb/wiki/BaseMaps-available
+	basemaps = ['light_all', 'dark_all', 'light_nolabels', 'light_only_labels', 'dark_nolabels', 'dark_only_labels', 
+		'rastertiles/voyager', 'rastertiles/voyager_nolabels', 'rastertiles/voyager_only_labels', 
+		'rastertiles/voyager_labels_under']
 	global mapbounds
 	print ("downloading basemap: " + base + '-map.png')
 	lonRange = abs(bounds['maxlon'] - bounds['minlon'])
@@ -408,14 +431,18 @@ def GetBaseMap():
 	mapbounds['maxlon'] = bounds['maxlon'] + lonRange * 0.1
 	mapbounds['minlat'] = bounds['minlat'] - latRange * 0.1
 	mapbounds['maxlat'] = bounds['maxlat'] + latRange * 0.1
-	smopy.TILE_SERVER = "http://tile.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png"
-	#smopy.TILE_SERVER = "http://tile.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"
+	s = 'c' # one of the available subdomains, either [a,b,c,d]
+	# {z} : Zoom level. We support from 0 to 20 zoom levels in OSM tiling system.
+	# {x},{y}: Tile coordinates in OSM tiling system
+	scale = '@2x' # OPTIONAL "@2x" for double resolution tiles
+	smopy.TILE_SERVER = f"https://{s}.basemaps.cartocdn.com/{basemaps[2]}/{{z}}/{{x}}/{{y}}{scale}.png"
 	smopy.TILE_SIZE = 512
 	map = smopy.Map((mapbounds['minlat'],mapbounds['minlon'],mapbounds['maxlat'],mapbounds['maxlon']), z=12, margin=0)
 	x1, y1 = map.to_pixels(mapbounds['maxlat'],mapbounds['minlon'])
 	x2, y2 = map.to_pixels(mapbounds['minlat'],mapbounds['maxlon'])
 	img = map.img.crop((x1,y1,x2,y2))
-	img.save(BASE + '-Map.png')
+	img.save(BASE + '-Map.png')	
+
 
 ### Save/Load results ####################################################################
 
@@ -468,6 +495,18 @@ def SaveResults():
 	with open(BASE + '-Map.geojson', 'w') as outfile:
 		json.dump(GeoJSON, outfile, indent=4, sort_keys=True)		
 
+	# Generate link reverse directoin matrix R
+	R=[]
+	items = GeoJSON['features']
+	for i in range(len(items)):
+		for j in range(len(items)):
+			if 	i != j and \
+				items[i]['properties']['p.dst'] == items[j]['properties']['p.org'] and	\
+				items[i]['properties']['p.org'] == items[j]['properties']['p.dst']:
+					if 	[items[i]['properties']['l.id'],items[j]['properties']['l.id']] not in R and \
+						[items[j]['properties']['l.id'],items[i]['properties']['l.id']] not in R:
+						R.append([items[i]['properties']['l.id'],items[j]['properties']['l.id']])
+
 	print ("saving to " + base + '-Map.points.geojson')
 	GeoJSON['features'] = []
 	for (k,v) in nodes.items():
@@ -487,7 +526,8 @@ def SaveResults():
 	        'bbox_roads':		bounds,
 	        'bbox_map':			mapbounds,
 	        'nodes':			nodes,
-	        'links':			links}
+	        'links':			links,
+			'LinkReverseDirection': R}
 	if verbose: print ("saving to " + base + '-Map.json')
 	with open(BASE + '-Map.json', 'w') as outfile:
 		json.dump(data, outfile, indent=4, sort_keys=True)
@@ -497,8 +537,8 @@ def SaveResults():
 ### Main #################################################################################
 
 if __name__ == "__main__":
-	print ("Starting...")
 	ProcessCLI()
+	print ("Starting...")
 	LoadDataFiles()
 	BuildNetwork()
 	CheckNetworkReducability(network=connectedlinks)
