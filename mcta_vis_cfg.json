@@ -1,0 +1,17 @@
+{
+	"CMAP":					"jet",
+	"DPI_SETTING": 			600,
+	"FIGURE_SIZE": 			[12,6],
+	"RenderRules":{
+		"default": {
+			"linestyle": 	"-",
+			"zorder": 		-1,
+			"linewidth": 	2
+		},
+		"LineString": {
+			"linestyle": 	"-",
+			"zorder": 		-1,
+			"linewidth": 	2
+		}
+	}
+}
