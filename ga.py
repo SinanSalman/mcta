@@ -6,16 +6,16 @@ from deap import creator, base, tools
 import mcta
 import mcta_rw
 import mcta_edit
-import mcta_vis
+# import mcta_vis
 
 AllGenes = 			[0, 1, 2]
-chromosome_size = 	180 # 180 for AD, 184 for AD2
+chromosome_size = 	184 # 180 for AD, 184 for AD2
 population_size = 	192 #192
 KeepBetweenGens = 	56 #56
 num_generations = 	5 #1000
 CXPB, MUTPB, IndpProb = 0.50, 0.18, 0.01  # crossover prob, mutation prob, individual gene mutations prob
 nObjectives = 		2		 			  # multi-objective optimization?
-MCTA_BaseFile =		'AD'
+MCTA_BaseFile =		'AD2'
 
 nFitnessValues = None
 ga_data = {}
@@ -23,9 +23,9 @@ ga_data['GA_Parameters'] = {'MCTA_BaseFile':MCTA_BaseFile,'AllGenes':AllGenes,'c
 LOG = ""
 
 # MCTA initialize and load roadnetwork data
-(Settings, JSON_Map, GeoJSON_Map) = mcta_rw.LoadDataFiles(MCTA_BaseFile)
-_, _, _, P = mcta.SetupMCTA(JSON_Map, GeoJSON_Map, Verbose=False)
-mcta_vis.Initialize(JSON_Map,Settings,MCTA_BaseFile,ShowFigs=True, SaveFigs2PNG=False)
+(Settings, GeoJSON) = mcta_rw.LoadDataFiles(MCTA_BaseFile)
+_, _, _, P = mcta.SetupMCTA(GeoJSON, Verbose=False)
+# mcta_vis.Initialize(GeoJSON,Settings,MCTA_BaseFile,ShowFigs=True, SaveFigs2PNG=False)
 
 
 def print2(txt):
@@ -35,7 +35,7 @@ def print2(txt):
 
 
 def evalObj(individual):
-	R = mcta_edit.ModifyNetworkAndSolveMC(P, individual, JSON_Map['VehiclesCountEst'], SkipChecksForSpeed = True)
+	R = mcta_edit.ModifyNetworkAndSolveMC(P, individual, GeoJSON['mcta_json']['VehiclesCountEst'], SkipChecksForSpeed = True)
 	# with numpy.errstate(all='ignore'):
 	return (R['Density'].max(), 
 			# R['KemenyConst'].real, 

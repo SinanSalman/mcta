@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Create map PNG, JSON and GeoJSON files from line network representation GeoGJSON file. The 
+Create map PNG and GeoJSON files from line network representation GeoGJSON file. The 
 model processes a simple one-way line network geoJSON export from qGIS. The output GeoJSON
 can be further fine-tuned in qGIS, and ultimately use in MCTA. The model will:
 	- add two way roads (with displacement)
@@ -15,33 +15,34 @@ Syntax:
 
 options:
 	--verbose	|	-v				display verbose messages and detailed results
-	--nobasemap	|	-n				don't create basemap
+	--nobasemap	|	-n				don't create basemap PNG file
+	--pointsfile|	-p				create a points GeoJSON file
 
 Input data files to load (must be in the script folder): 
 	{BaseName}-config.json			configuration (settings and rules) JSON file
 	{BaseName}-Lines.geojson		qGIS lines GeoJSON export for the Road network 
 									 (single link features)
 Output file:
+	{BaseName}-Map.points.geojson	Road network points for display in qGIS (optional via -p)
+	{BaseName}-Map.png				Basemap for the road network for use in mcta_vis.py
 	{BaseName}-Map.geojson			GeoSJSON file with added link attributes and two-way
 									 roads for analysis in qGIS and use in mcta.py
-	{BaseName}-Map.json				Road network data in JSON format for use in mcta.py
-	{BaseName}-Map.png				Basemap for the road network for use in mcta_vis.py
-	{BaseName}-Map.points.geojson	Road network points for display in qGIS
 
 Complete Code run-through test:
-	python ./prep_geojson.py --verbose {BaseName}
-	python ./prep_geojson.py -v {BaseName}	
+	python ./prep_geojson.py --verbose --pointsfile {BaseName}
+	python ./prep_geojson.py -v -p {BaseName}	
 	
 Code by Sinan Salman, 2016-2019
 """
 
 HELP_MSG = "Options:\n\
-\t--verbose  | -v  display verbose messages and detailed results\n\
-\t--basemap  | -b  create basemap\n"
+\t--verbose  	| -v  display verbose messages and detailed results\n\
+\t--nobasemap  	| -n  don't create basemap PNG file\n\
+\t--pointsfile	| -p  create a points GeoJSON file\n"
 
 __author__ = 	"Sinan Salman (sinan.salman@zu.ac.ae)"
-__version__ = 	"Revision: 0.11"
-__date__ = 		"Date: 2019/06/10"
+__version__ = 	"Revision: 0.12"
+__date__ = 		"Date: 2019/07/17"
 __copyright__ = "Copyright (c)2019 Sinan Salman"
 __license__ = 	"GPLv3"
 
@@ -56,6 +57,7 @@ import math
 # options
 verbose = False
 basemap = True
+pointsfile = False
 
 # global variables
 path = ""
@@ -80,6 +82,7 @@ def ProcessCLI():
 	global base
 	global verbose
 	global basemap
+	global pointsfile
 
 	if len(sys.argv) == 1:
 		print("Missing argument\n\nSyntax:\n\tpython prep_geojson.py [options] {BaseName}")
@@ -92,6 +95,9 @@ def ProcessCLI():
 	if '--nobasemap' in sys.argv or '-n' in sys.argv:
 		print ("*** option: skipping creation of basemap")
 		basemap = False
+	if '--pointsfile' in sys.argv or '-p' in sys.argv:
+		print ("*** option: create a GeoJSON pointsfile")
+		pointsfile = True
 	base = sys.argv[len(sys.argv)-1]
  
 
@@ -466,7 +472,6 @@ def SaveResults():
 		Ay += Dy
 		Bx += Dx
 		By += Dy
-		
 		GeoJSON['features'].append({ 
 			"type": "Feature", 
 			"properties": { 
@@ -492,9 +497,6 @@ def SaveResults():
 				"coordinates": [[Ax,Ay],[Bx,By]] 
 				} 
 			})
-	with open(BASE + '-Map.geojson', 'w') as outfile:
-		json.dump(GeoJSON, outfile, indent=4, sort_keys=True)		
-
 	# Generate link reverse directoin matrix R
 	R=[]
 	items = GeoJSON['features']
@@ -506,31 +508,33 @@ def SaveResults():
 					if 	[items[i]['properties']['l.id'],items[j]['properties']['l.id']] not in R and \
 						[items[j]['properties']['l.id'],items[i]['properties']['l.id']] not in R:
 						R.append([items[i]['properties']['l.id'],items[j]['properties']['l.id']])
-
-	print ("saving to " + base + '-Map.points.geojson')
-	GeoJSON['features'] = []
-	for (k,v) in nodes.items():
-		GeoJSON['features'].append({ 
-			"type": "Feature", 
-			"properties": {
-				"id": k }, 
-			"geometry": { 
-				"type": "Point", 
-				"coordinates": [ nodes[k]['lon'], nodes[k]['lat'] ] 
-				} 
-			})
-	with open(BASE + '-Map.points.geojson', 'w') as outfile:
-		json.dump(GeoJSON, outfile, indent=4, sort_keys=True)		
-
+	# Generate mcta_json data structure
 	data = {'VehiclesCountEst':	Settings['VehiclesCountEst'],
 	        'bbox_roads':		bounds,
 	        'bbox_map':			mapbounds,
 	        'nodes':			nodes,
 	        'links':			links,
 			'LinkReverseDirection': R}
-	if verbose: print ("saving to " + base + '-Map.json')
-	with open(BASE + '-Map.json', 'w') as outfile:
-		json.dump(data, outfile, indent=4, sort_keys=True)
+	GeoJSON['mcta_json'] = data
+	with open(BASE + '-Map.geojson', 'w') as outfile:
+		json.dump(GeoJSON, outfile, indent=4, sort_keys=True)		
+
+	if pointsfile:
+		print ("saving to " + base + '-Map.points.geojson')
+		GeoJSON['features'] = []
+		for (k,v) in nodes.items():
+			GeoJSON['features'].append({ 
+				"type": "Feature", 
+				"properties": {
+					"id": k }, 
+				"geometry": { 
+					"type": "Point", 
+					"coordinates": [ nodes[k]['lon'], nodes[k]['lat'] ] 
+					} 
+				})
+		with open(BASE + '-Map.points.geojson', 'w') as outfile:
+			json.dump(GeoJSON, outfile, indent=4, sort_keys=True)		
+
 	if verbose: print ("\t" + str(len(nodes)) + " nodes")
 	if verbose: print ("\t" + str(len(links)) + " links")
 

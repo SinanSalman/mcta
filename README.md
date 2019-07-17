@@ -3,8 +3,6 @@ This is a Python implementation of the MCTA approach proposed by [1] and expande
 
 The following table describes the use of each mcta module. Examples of its use can be found in the jupyter files `test_mcta.ipynb` and `test_mcta_runtime.ipynb`
 
-
-
 File|Description
 ---|---
 mcta_cli.py|MCTA Command Line Interface (CLI). *This is where you should start.*

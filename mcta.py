@@ -12,7 +12,7 @@ Results are stored in:
 	Results		a dictionary object with mcta results 
 
 _author = 	"Sinan Salman (sinan.salman@zu.ac.ae)"
-_version = 	"Revision: 0.18"
+_version = 	"Revision: 0.19"
 _date = 	"Date: 2019/07/17"
 _copyright= "Copyright (c)2017-2019 Sinan Salman"
 _license =	"GPLv3"
@@ -47,8 +47,8 @@ def _string2list(str, TYPE='int'): # for strings of the format (#:1,2,3,4,...)
 
 ### Setup MCTA ###########################################################################
 
-def _SetupTransitionMatrix_P(GeoJSON_Map):
-	"""populate transition matrix from GeoJSON_Map link attributes."""
+def _SetupTransitionMatrix_P(GeoJSON):
+	"""populate transition matrix from GeoJSON link attributes."""
 	if _verbose:
 		print ('\n\tConstructing Transition Matrix...')
 	linkcount = len(_links)
@@ -57,7 +57,7 @@ def _SetupTransitionMatrix_P(GeoJSON_Map):
 	FoundErrors = ""
 	corrections1 = 0
 	corrections2 = 0
-	for item in GeoJSON_Map['features']:
+	for item in GeoJSON['features']:
 		id = item['properties']['l.id']
 		if _verbose:
 			print ('\tlink: {:}'.format(id))
@@ -152,24 +152,23 @@ def _ModifyForLinkTravelTime(P):
 		_results['StepTime'] = ltt_min
 	return 	P
 
-def SetupMCTA(JSON_Map, GeoJSON_Map, Verbose = False):	
+def SetupMCTA(GeoJSON, Verbose = False):	
 	"""Setup MCTA network
-	SetupMCTA(JSON_Map, GeoJSON_Map, Verbose = False)
-		JSON_Map	road network dictionary loaded from JSON file (for links)
-		GeoJSON_Map	road network dictionary loaded from GeoJSON file (for turning probabilities, lenght, lanes, etc.)
+	SetupMCTA(GeoJSON, Verbose = False)
+		GeoJSON		road network dictionary loaded from GeoJSON file (for links, turning probabilities, lenght, lanes, etc.)
 		Verbose		show detailed outputs"""
 	global _verbose
 	global _links
 	global _ReverseLinks
 	global _results
 	_verbose = Verbose
-	_links = {int(k):v for k,v in JSON_Map['links'].items()} # convert dictionary keys to int since JSON require them to be string
-	_ReverseLinks = JSON_Map['LinkReverseDirection']
+	_links = {int(k):v for k,v in GeoJSON['mcta_json']['links'].items()} # convert dictionary keys to int since JSON require them to be string
+	_ReverseLinks = GeoJSON['mcta_json']['LinkReverseDirection']
 	_results['linkIDs'] = _sp.array(list(_links.keys())) + 1 # streets; start from 1
 	lengths = _sp.array([_links[id]['length'] for id in _links.keys()])
 	lanes = _sp.array([_links[id]['lanes'] for id in _links.keys()])
 	FreeFlowSpeeds = _sp.array([_links[id]['speed'] for id in _links.keys()])
-	P = _ModifyForLinkTravelTime(_SetupTransitionMatrix_P(GeoJSON_Map))
+	P = _ModifyForLinkTravelTime(_SetupTransitionMatrix_P(GeoJSON))
 	return lengths, lanes, FreeFlowSpeeds,P
 
 

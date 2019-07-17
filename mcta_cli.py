@@ -14,9 +14,8 @@ options:
 							({BaseName}-Results.json)
 
 Input data files to load (must be in the script folder):
-	mcta_vis_cfg.json				visualization settings JSON file
+	mcta_vis.json					visualization settings JSON file
 	{BaseName}-Map.png				Base map PNG image, used in road map rendering
-	{BaseName}-Map.json				Road network JSON file
 	{BaseName}-Map.geojson			Road network GeoJSON file (for road attributes)
 
 Optional output files:
@@ -38,8 +37,8 @@ HELP_MSG = "Options:\n\
 \t                   ({BaseName}-Results.json)\n"
 
 __author__ = 	"Sinan Salman (sinan.salman@zu.ac.ae)"
-__version__ = 	"Revision: 0.17"
-__date__ = 		"Date: 2019/07/08"
+__version__ = 	"Revision: 0.18"
+__date__ = 		"Date: 2019/07/17"
 __copyright__ = "Copyright (c)2017-2019 Sinan Salman"
 __license__ = 	"GPLv3"
 
@@ -95,16 +94,16 @@ def ProcessCLI():
 
 if __name__ == "__main__":
 	ProcessCLI()
-	(Settings, JSON_Map, GeoJSON_Map) = mcta_rw.LoadDataFiles(base)
-	lengths, lanes, FFS, P = mcta.SetupMCTA(JSON_Map, GeoJSON_Map, Verbose=verbose)
+	(Settings, GeoJSON) = mcta_rw.LoadDataFiles(base)
+	lengths, lanes, FFS, P = mcta.SetupMCTA(GeoJSON, Verbose=verbose)
 	Results = mcta.SolveMCTA(lengths=lengths, lanes=lanes, P=P, 
-							VehiclesCount=JSON_Map['VehiclesCountEst'], 
+							VehiclesCount=GeoJSON['mcta_json']['VehiclesCountEst'], 
 							Objectives=['D','K','C','PI','E'], 
 							FreeFlowSpeeds=FFS, SkipChecksForSpeed=False)
 	if savememdump:
 		mcta_rw.SaveResults(Results)
 	if showfigs or figs2png:
-		mcta_vis.Initialize(JSON_Map,Settings,base,ShowFigs=showfigs, SaveFigs2PNG=figs2png)
+		mcta_vis.Initialize(GeoJSON,Settings,base,ShowFigs=showfigs, SaveFigs2PNG=figs2png)
 	for x in Results.keys():
 		if x not in ['linkIDs','P_org','P_updated','eigenvalues']:
 			print(f'\n{x}: {Results[x]}')

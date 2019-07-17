@@ -4,7 +4,7 @@
 Markov Chains Traffic Assignment (MCTA) visualization module
 
 Usage:
-	Initialize(JSON_Map, Settings, Base = 'MCTA', ShowFigs=True, SaveFigs2PNG=False)
+	Initialize(GeoJSON, Settings, Base = 'MCTA', ShowFigs=True, SaveFigs2PNG=False)
 	Generate_Figure(Variable, Limit=0)
 	ShowModificationOnMap(EditedLinks)
 Results:
@@ -33,10 +33,10 @@ _figs2png = False
 _bounds = None
 _mapbounds = None
 
-def Initialize(JSON_Map, Settings, Base = 'MCTA', ShowFigs=True, SaveFigs2PNG=False):
+def Initialize(GeoJSON, Settings, Base = 'MCTA', ShowFigs=True, SaveFigs2PNG=False):
 	"""Initialize can configure visualization module
-	Initialize(JSON_Map, Settings, Base = 'MCTA', ShowFigs=True, SaveFigs2PNG=False)
-		JSON_Map		roadnetwork dictionary loaded from JASON file (for map bounding box)
+	Initialize(GeoJSON, Settings, Base = 'MCTA', ShowFigs=True, SaveFigs2PNG=False)
+		GeoJSON			roadnetwork dictionary loaded from GeoJSON file (for map bounding box)
 		Settings		figure settings (CMAP, Figure_Size, RenderingRules, DPI_Setting)
 		Base			base name for figure files
 		ShowFigs		show figures on screen
@@ -52,8 +52,8 @@ def Initialize(JSON_Map, Settings, Base = 'MCTA', ShowFigs=True, SaveFigs2PNG=Fa
 	_BASE = Base
 	_showfigs = ShowFigs
 	_figs2png = SaveFigs2PNG
-	_bounds = JSON_Map['bbox_roads']
-	_mapbounds = JSON_Map['bbox_map']
+	_bounds = GeoJSON['mcta_json']['bbox_roads']
+	_mapbounds = GeoJSON['mcta_json']['bbox_map']
 	_Settings = Settings
 	_CMAP = _plt.get_cmap(Settings['CMAP'])
 	_Show_Save_Fig.FigNum = 1
