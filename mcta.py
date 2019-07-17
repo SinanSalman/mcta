@@ -4,9 +4,6 @@
 Markov Chains Traffic Assignment (MCTA) module
 
 Analyze road network traffic using Descrete Time Markov Chain (DTMC)
-based on model by Crisostomi, et. al (2011). "A Google-like model of road network dynamics
-and its application to regulation and control". International Journal of Control, 84(3),
-633–651. http://doi.org/10.1080/00207179.2011.568005
 
 Usage:
 	SetupMCTA(JSON_Map, GeoJSON_Map, Verbose = False)
@@ -15,19 +12,10 @@ Results are stored in:
 	Results		a dictionary object with mcta results 
 
 _author = 	"Sinan Salman (sinan.salman@zu.ac.ae)"
-_version = 	"Revision: 0.17"
-_date = 	"Date: 2019/06/11"
+_version = 	"Revision: 0.18"
+_date = 	"Date: 2019/07/17"
 _copyright= "Copyright (c)2017-2019 Sinan Salman"
 _license =	"GPLv3"
-
-ToDo:
-# need more accurate distance estimation function
-# speed ups:
-	SolveMCTA() - use only one Kemmeny constant method (the fastest)
-	speed up MFPT() calc
-	speed up FindEigen() (for j Assert)
-	speed up list comprehetion in ModifytforLinkTT()
-# remove unneeded code
 """
 
 ### Initialization #######################################################################

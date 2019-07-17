@@ -10,8 +10,8 @@ Usage:
 
 
 _author = 	"Sinan Salman (sinan.salman@zu.ac.ae)"
-_version = 	"Revision: 0.17"
-_date = 	"Date: 2019/06/11"
+_version = 	"Revision: 0.18"
+_date = 	"Date: 2019/07/17"
 _copyright= "Copyright (c)2017-2019 Sinan Salman"
 _license =	"GPLv3"
 """
@@ -196,13 +196,13 @@ def ModifyNetworkAndSolveMC(P, LinksEdits, VehiclesCount=1, Objectives=['D','K',
                          	  Objectives=Objectives, FreeFlowSpeeds=FFS, 
 							  SkipChecksForSpeed=SkipChecksForSpeed)
 	
-
 	# Post-solve edit
 	NoPostSolveEditsNeeded = ['linkIDs','P_org','P_updated','StepTime','KemenyConst','Message']  # skip items not changed in pre-solve edits
 	Removed_Links_Count = len(REMOVE)
 	if Removed_Links_Count > 0:
 		if Delete_States:
-			ADD_BACK = _sp.array([0]*Removed_Links_Count)
+			# AB: Add_Back
+			AB1 = _sp.array([0]*Removed_Links_Count)
 			AB2 = _sp.zeros((nl,Removed_Links_Count))
 			AB3 = _sp.zeros((Removed_Links_Count,nl))
 			AB4 = _sp.zeros((Removed_Links_Count,Removed_Links_Count))
@@ -212,7 +212,7 @@ def ModifyNetworkAndSolveMC(P, LinksEdits, VehiclesCount=1, Objectives=['D','K',
 			if hasattr(Results[k],'shape'):
 				if len(Results[k].shape) == 1:
 					if Delete_States:
-						Results[k] = _sp.append(Results[k],ADD_BACK)
+						Results[k] = _sp.append(Results[k],AB1)
 					Results[k] = (Results[k]*Q).A1
 				elif len(Results[k].shape) == 2:
 					if Delete_States:

@@ -22,7 +22,7 @@ import json as _json
 import numpy as _np
 
 # global variables
-_config_file = 'mcta_vis_cfg.json'
+_config_file = 'mcta_vis.json'
 _BASE = ''
 _base = ''
 

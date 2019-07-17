@@ -1,5 +1,5 @@
 # Markov Chain Traffic Assignment (MCTA)
-This is an implementation in python of the MCTA approach proposed by [1] and expanded upon in [2,3,4].
+This is a Python implementation of the MCTA approach proposed by [1] and expanded upon in [2,3,4].
 
 The following table describes the use of each mcta module. Examples of its use can be found in the jupyter files `test_mcta.ipynb` and `test_mcta_runtime.ipynb`
 
