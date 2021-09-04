@@ -265,6 +265,7 @@ def SolveMCTA(lengths, lanes, P, VehiclesCount=1, Objectives=['D','K','C','PI','
 													'E' = CO Emissions
 		SkipChecksForSpeed	true to speed up the code by skipping verification and validation steps; it will also turn verbosity off"""
 	global _results
+	ResultMsg = ''
 	if _verbose and not SkipChecksForSpeed:
 		print ('\nMCTA results:')
 		import time
@@ -314,7 +315,8 @@ def SolveMCTA(lengths, lanes, P, VehiclesCount=1, Objectives=['D','K','C','PI','
 		Speeds, _ = _em.Speed_via_Density(D,'veh/(km.lane)',FreeFlowSpeeds,'km/h') # estimate vehicles speed on each link
 		_results['Speeds']=Speeds
 		EC, _ = _em.ExternalCost(Speeds, 'km/h', Method='TRANSYT7f') # Calculate average vehicle emissions cost $/(km.veh)
-		_results['EmissionCost'] = EC * VehiclesCount * pi  # Calculate average link emissions $/km (in less operations)
+		_results['EmissionCost($/km)'] = EC * VehiclesCount * pi    # Calculate average link emissions $/km (in less operations)
+		_results['EmissionCost($/hr)'] = EC * lengths * D * Speeds  # Calculate average link emissions $/hr (in less operations)
 		_results['TotalNetworkEmissionCost'] = sum(EC * lengths * D * Speeds)  # Calculate total network emissions $/hr (Emissions * flow, while flow = Density * Speed)
 
 	if _verbose and not SkipChecksForSpeed:
@@ -332,7 +334,7 @@ def SolveMCTA(lengths, lanes, P, VehiclesCount=1, Objectives=['D','K','C','PI','
 		print ('\tcompleted MCTA in {:.3f} seconds.'.format(time.time()-tmr))
 
 	_results['Message'] = ResultMsg
-	return _results
+	return _results.copy()
 
 ### Main ########################################################################
 

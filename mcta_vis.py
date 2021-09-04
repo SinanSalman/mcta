@@ -157,8 +157,8 @@ def _RenderMap(X, Title='RoadNetwork', LinkEndMark='s', Limit=0):
 	ax.set_title(Title)
 
 	if _os.path.isfile(_BASE + '-Map.png'):
-		import PIL
-		img = PIL.Image.open(_BASE + "-Map.png")
+		from PIL import Image
+		img = Image.open(_BASE + "-Map.png")
 		_plt.imshow(img, zorder=-100, extent=[ _mapbounds['minlon'],_mapbounds['maxlon'],_mapbounds['minlat'],_mapbounds['maxlat'] ])
 	else:
 		print ("warning - '" + _BASE + "-Map.png' file not found")
@@ -207,8 +207,10 @@ def Generate_Figure(Results, Variable, Limit=0):
 	info = {'StationaryProb':{'x':'Roads IDs', 'y':'Probability density', 'title':'Stationary probability distribution of vehicles'},
 			'Density':{'x':'Roads IDs', 'y':'Density', 'title':'Road traffic density $\\left(\\frac{vehicles}{km \\cdot lane}\\right)$'},
 			'Clusters':{'x':'Roads IDs', 'y':'Entries of the second eigenvector', 'title':'Clusters in road network'},
-			'Emission':{'x':'Roads IDs', 'y':"Road's average CO emissions (g/km)", 'title':'Average CO emissions (g/km)'}}
-	
+			'Emission':{'x':'Roads IDs', 'y':"Road's average CO emissions (g/km)", 'title':'Average CO emissions (g/km)'},
+         	'EmissionCost($/hr)': {'x': 'Roads IDs', 'y': "Road Emissions External Cost ($/km)", 'title': "Road Emissions External Costs($/km)"},
+         	'EmissionCost($/km)': {'x': 'Roads IDs', 'y': "Road Emissions External Cost ($/hr)", 'title': "Road Emissions External Costs($/km)"}}
+
 	if Variable in ['linkIDs','Message']:
 		return  # ignore
 	if Variable not in Results.keys():
@@ -229,7 +231,7 @@ def Generate_Figure(Results, Variable, Limit=0):
 		return
 
 
-def ShowModificationOnMap(EditedLinks): # 14 and 27 are arbitrary density values to color coding only
+def ShowModificationOnMap(EditedLinks): # 14 and 27 are arbitrary density values for color coding only
 	revlinks = _mcta._ReverseLinks
 	sol=_sp.matrix([14]*len(EditedLinks)*2).T
 	for i in range(len(EditedLinks)):
