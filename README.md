@@ -11,7 +11,7 @@ mcta_edit.py|MCTA network modification module
 mcta_rw.py|MCTA input/output data read/write module
 mcta_vis.py|MCTA visualization module
 
-# Gnetic Algorithm
+# Genetic Algorithm
 `ga.py` and `ga_batch_run.py` implements a genetic algorithm metaheuristic on top of MCTA. resutls are graphed using `ga_polts.ipynb`.
 
 # emissions.py
