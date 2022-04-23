@@ -208,8 +208,8 @@ def Generate_Figure(Results, Variable, Limit=0):
 			'Density':{'x':'Roads IDs', 'y':'Density', 'title':'Road traffic density $\\left(\\frac{vehicles}{km \\cdot lane}\\right)$'},
 			'Clusters':{'x':'Roads IDs', 'y':'Entries of the second eigenvector', 'title':'Clusters in road network'},
 			'Emission':{'x':'Roads IDs', 'y':"Road's average CO emissions (g/km)", 'title':'Average CO emissions (g/km)'},
-         	'EmissionCost($/hr)': {'x': 'Roads IDs', 'y': "Road Emissions External Cost ($/km)", 'title': "Road Emissions External Costs($/km)"},
-         	'EmissionCost($/km)': {'x': 'Roads IDs', 'y': "Road Emissions External Cost ($/hr)", 'title': "Road Emissions External Costs($/km)"}}
+         	'EmissionCost($/hr)': {'x': 'Roads IDs', 'y': "Road Emissions External Cost ($/hr)", 'title': "Road Emissions External Costs($/hr)"},
+         	'EmissionCost($/km)': {'x': 'Roads IDs', 'y': "Road Emissions External Cost ($/km)", 'title': "Road Emissions External Costs($/km)"}}
 
 	if Variable in ['linkIDs','Message']:
 		return  # ignore

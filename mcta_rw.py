@@ -4,12 +4,12 @@
 Markov Chains Traffic Assignment (MCTA) read/write module
 
 Usage:
-	(Settings, JSON_Map, GeoJSON_Map) = LoadDataFiles(base)
+	(Settings, GeoJSON) = LoadDataFiles(base)
 	SaveResults(results)
 
 _author = 	"Sinan Salman (sinan.salman@zu.ac.ae)"
-_version = 	"Revision: 0.17"
-_date = 	"Date: 2019/06/11"
+_version = 	"Revision: 0.18"
+_date = 	"Date: 2019/07/17"
 _copyright= "Copyright (c)2017-2019 Sinan Salman"
 _license =	"GPLv3"
 """
@@ -22,7 +22,7 @@ import json as _json
 import numpy as _np
 
 # global variables
-_config_file = 'mcta_vis_cfg.json'
+_config_file = 'mcta_vis.json'
 _BASE = ''
 _base = ''
 
@@ -40,11 +40,10 @@ class ComplexEncoder(_json.JSONEncoder):
 def LoadDataFiles(base):
 	"""load data and configuration files
 	LoadDataFiles(base)
-		base	input/output files prefix
+		base	input/output files prefix (.json .geojson .png)
 	Results:
 		Settings	visualization settings (CMAP, Figure_Size, RenderingRules, DPI_Setting)
-		JSON_Map	road network dictionary loaded from JSON file (for links)
-		GeoJSON_Map	road network dictionary loaded from GeoJSON file (for turning probabilities, lenght, lanes, etc.)
+		GeoJSON		road network dictionary loaded from GeoJSON file (for links, turning probabilities, lenght, lanes, etc.)
 		"""
 	global _BASE
 	global _base
@@ -62,23 +61,15 @@ def LoadDataFiles(base):
 		print (f"\nerror - can't find {_config_file}.")
 		_sys.exit(0)
 
-	if _os.path.isfile(_BASE + '-Map.json'):
-		print ('\treading ' + base + '-Map.json')
-		with open(_BASE + '-Map.json') as Mapjsonfile:
-			JSON_Map = _json.load(Mapjsonfile)
+	if _os.path.isfile(_BASE + '-Map.geojson'):
+		print ('\treading ' + base + '-Map.geojson')
+		with open(_BASE + '-Map.geojson') as geojsonfile:
+			GeoJSON = _json.load(geojsonfile)
 	else:
 		print ("\nerror - can't find JSON file for the specified BaseName: " + base)
 		_sys.exit(0)
-
-	if _os.path.isfile(_BASE + '-Map.geojson'):
-		print ('\treading ' + base + '-Map.geojson')
-		with open(_BASE + '-Map.geojson') as Mapgeojsonfile:
-			GeoJSON_Map = _json.load(Mapgeojsonfile)
-	else:
-		print ("\nerror - can't find GeoJSON file for the specified BaseName: " + base)
-		_sys.exit(0)
 	
-	return Settings, JSON_Map, GeoJSON_Map
+	return Settings, GeoJSON
 
 
 ### Save/Load results ####################################################################
@@ -88,9 +79,9 @@ def SaveResults(Results):
 	print ("\tsaving memdump to " + _base + '-Results.json')
 	MemDump = {}
 	for k,v in Results.items():
-		if k in ['P_org','P_updated','StepTime','KemenyConst','Message','TotalNetworkEmission']:
+		if k in ['P_org','P_updated','StepTime','KemenyConst','Message','TotalNetworkEmissionCost']:
 			MemDump[k] = v
-		elif k in ['eigenvalues','StationaryProb','Clusters','Density','linkIDs','Emission']:
+		elif k in ['eigenvalues','StationaryProb','Clusters','Density','linkIDs','EmissionCost($/km)','EmissionCost($/hr)','Speeds']:
 			MemDump[k] = v.real.tolist()
 		elif k in ['eigenvectors']:
 			MemDump[k] = v.real.T.tolist()
